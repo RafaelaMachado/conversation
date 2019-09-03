@@ -2,8 +2,8 @@
     <div class="container-fluid h-100 p-0 d-flex" v-if="currentUser">
         <div class="w-25 sidebar">
             <div class="current-user bg-light d-flex align-items-center flex-nowrap p-2">
-                <user-avatar :name="currentUser.username"/>
-                <div class="ml-2 text-truncate">{{currentUser.username}}</div>
+                <user-avatar :name="currentUser.displayName"/>
+                <div class="ml-2 text-truncate">{{currentUser.displayName}}</div>
                 <button class="btn btn-sm btn-link ml-auto" @click="logout"><i class="material-icons">exit_to_app</i></button>
             </div>
             <div class="channels-list bg-light p-2">

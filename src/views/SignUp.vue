@@ -77,14 +77,14 @@ export default {
                 .then(({ user }) => {
                     user
                         .updateProfile({
-                            username: this.name
+                            displayName: this.name
                         })
                         .then(() => {
                             this.usersRef.doc(user.uid)
                                 .set({
                                     id: user.uid,
                                     email: user.email,
-                                    name: user.username
+                                    name: user.displayName
                                 })
                                 .then(() => {
                                     this.$store.dispatch('setCurrentUser', user)
