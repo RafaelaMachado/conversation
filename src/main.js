@@ -4,13 +4,22 @@ import router from './router'
 import store from './store'
 import 'bootstrap-css-only/css/bootstrap.min.css'
 import UserAvatar from '@/components/UserAvatar'
+import firebase from 'firebase'
+import config from './config'
+
+firebase.initializeApp(config)
+window.firebase = firebase
 
 Vue.component('UserAvatar', UserAvatar)
 
 Vue.config.productionTip = false
 
-new Vue({
-    router,
-    store,
-    render: h => h(App)
-}).$mount('#app')
+firebase.auth().onAuthStateChanged(user => {
+    store.dispatch('setCurrentUser', user)
+    /* eslint-disable no-new */
+    new Vue({
+        router,
+        store,
+        render: h => h(App)
+    }).$mount('#app')
+})
