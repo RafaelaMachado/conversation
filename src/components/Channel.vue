@@ -1,5 +1,5 @@
 <template functional>
-    <div class="d-flex channel rounded p-1 mb-1" :class="{'is-active': props.isActive}">>
+    <div class="d-flex channel rounded p-1 mb-1" :class="{'is-active': props.isActive}">
         <div class="w-100" @click="listeners.activate(props.name)">#{{props.name}}</div>
         <button
             title="Archive"

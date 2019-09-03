@@ -24,7 +24,20 @@
                 #{{ currentChannel }}
             </div>
             <div class="channel-messages flex-grow-1 p-2" ref="channelMessages">
-                <message-loader />
+                <transition name="fade" mode="out-in">
+                    <transition-group name="fade" v-if="messages.length">
+                        <message
+                            v-for="message in messages"
+                            :message="message"
+                            :key="`message-${message.id}`"
+                            :current-user="currentUser"
+                        />
+                    </transition-group>
+                    <div key="no-records" v-else-if="!loadingMessages" class="alert alert-secondary font-italic">No messages registered</div>
+                    <div key="loading-records" class="text-center" v-else>
+                        <message-loader/>
+                    </div>
+                </transition>
             </div>
             <message-form ref="messageForm"/>
         </div>
@@ -34,6 +47,7 @@
 <script>
 import AddChannel from '@/components/AddChannel'
 import Channel from '@/components/Channel'
+import Message from '@/components/Message'
 import MessageForm from '@/components/MessageForm'
 import MessageLoader from '@/components/MessageLoader'
 
@@ -42,6 +56,7 @@ export default {
     components: {
         AddChannel,
         Channel,
+        Message,
         MessageForm,
         MessageLoader
     },
@@ -49,7 +64,10 @@ export default {
         return {
             channelsListRef: window.firebase.firestore().collection('channels'),
             channelListener: () => {},
-            channels: []
+            channels: [],
+            loadingMessages: false,
+            messages: [],
+            messageListener: () => {}
         }
     },
     computed: {
@@ -87,6 +105,30 @@ export default {
                 .collection('channels')
                 .doc(channelName)
                 .set({ archived: true }, { merge: true })
+        },
+        loadMessages () {
+            if (!this.currentChannel) return
+            this.loadingMessages = true
+            this.messageListener = window.firebase.firestore()
+                .collection('messages')
+                .doc(this.currentChannel)
+                .collection('messages')
+                .orderBy('timestamp', 'asc')
+                .onSnapshot((querySnapshot) => {
+                    this.messages = querySnapshot.docs.map((doc) => {
+                        return {
+                            id: doc.id,
+                            ...doc.data()
+                        }
+                    })
+                    this.loadingMessages = false
+                    this.$nextTick(() => {
+                        const animationDuration = 300
+                        setTimeout(() => {
+                            this.$refs.channelMessages.scrollTop = this.$refs.channelMessages.scrollHeight
+                        }, animationDuration)
+                    })
+                })
         }
     },
     created () {
@@ -96,6 +138,15 @@ export default {
             .onSnapshot((querySnapshot) => {
                 this.channels = querySnapshot.docs.map(doc => doc.id)
             })
+    },
+    watch: {
+        currentChannel: {
+            handler (currentChannel) {
+                this.messageListener()
+                this.loadMessages()
+            },
+            immediate: true
+        }
     }
 }
 </script>

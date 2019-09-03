@@ -1,11 +1,53 @@
 <template>
     <div class="message-form d-flex align-items-center bg-light">
-        <textarea placeholder="Enter your message here" class="bg-light" ref="textarea"/>
-        <button class="btn btn-sm btn-purple border-left">
+        <textarea placeholder="Enter your message here" class="bg-light" v-model.trim="message" @keydown.enter.prevent="sendMessage" ref="textarea"/>
+        <button @click="sendMessage" class="btn btn-sm btn-purple border-left">
             <i class="material-icons">message</i>
         </button>
     </div>
 </template>
+
+<script>
+export default {
+    name: 'MessageForm',
+    data () {
+        return {
+            message: ''
+        }
+    },
+    computed: {
+        currentUser () {
+            return this.$store.getters.currentUser
+        },
+        currentChannel () {
+            return this.$store.getters.currentChannel
+        }
+    },
+    methods: {
+        sendMessage () {
+            if (!this.message) return
+            window.firebase.firestore()
+                .collection('messages')
+                .doc(this.currentChannel)
+                .collection('messages')
+                .add({
+                    content: this.message,
+                    timestamp: window.firebase.firestore.FieldValue.serverTimestamp(),
+                    user: {
+                        name: this.currentUser.displayName,
+                        id: this.currentUser.uid
+                    }
+                })
+                .then(() => {
+                    this.message = ''
+                    this.$nextTick(() => {
+                        this.$refs.textarea.focus()
+                    })
+                })
+        }
+    }
+}
+</script>
 
 <style lang="scss">
 .message-form {
