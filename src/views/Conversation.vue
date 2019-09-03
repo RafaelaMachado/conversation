@@ -7,6 +7,8 @@
                 <button class="btn btn-sm btn-link ml-auto"><i class="material-icons">exit_to_app</i></button>
             </div>
             <div class="channels-list bg-light p-2">
+                <add-channel />
+                <channel v-for="i in 5" :key="`channel-teste-${i}`" :name="`channel-teste-${i}`"/>
             </div>
         </div>
 
@@ -22,8 +24,15 @@
 </template>
 
 <script>
+import AddChannel from '@/components/AddChannel'
+import Channel from '@/components/Channel'
+
 export default {
     name: 'Conversation',
+    components: {
+        AddChannel,
+        Channel
+    },
     data () {
         return {
             currentUser: {
