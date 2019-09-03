@@ -17,9 +17,9 @@
             </div>
             <div class="channel-messages flex-grow-1 p-2" ref="channelMessages">
                 <message-loader />
+                <message v-for="message in messages" :message="message" :key="`message-${message.id}`" :current-user="currentUser"/>
             </div>
-            <div style="height: 50px;" class="message-form border-top d-flex align-items-center">
-            </div>
+            <message-form />
         </div>
     </div>
 </template>
@@ -27,6 +27,8 @@
 <script>
 import AddChannel from '@/components/AddChannel'
 import Channel from '@/components/Channel'
+import Message from '@/components/Message'
+import MessageForm from '@/components/MessageForm'
 import MessageLoader from '@/components/MessageLoader'
 
 export default {
@@ -34,6 +36,8 @@ export default {
     components: {
         AddChannel,
         Channel,
+        Message,
+        MessageForm,
         MessageLoader
     },
     data () {
@@ -46,7 +50,7 @@ export default {
         }
     },
     created () {
-        for (let i = 1; i <= 10; i++) {
+        for (let i = 1; i <= 5; i++) {
             this.messages.push({
                 id: i,
                 content: `Mensage ${i}`,
