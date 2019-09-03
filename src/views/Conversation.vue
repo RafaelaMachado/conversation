@@ -8,18 +8,25 @@
             </div>
             <div class="channels-list bg-light p-2">
                 <add-channel />
-                <channel v-for="i in 5" :key="`channel-teste-${i}`" :name="`channel-teste-${i}`"/>
+                <channel
+                    v-for="(channel, index) in channels"
+                    :key="`channel-${index}`"
+                    :name="channel"
+                    :is-active="channel === currentChannel"
+                    @activate="setActiveChannel"
+                    @archive="archiveChannel"
+                />
             </div>
         </div>
 
         <div class="d-flex flex-column w-75">
             <div class="channel-header bg-light p-2 d-flex align-items-center">
+                #{{ currentChannel }}
             </div>
             <div class="channel-messages flex-grow-1 p-2" ref="channelMessages">
                 <message-loader />
-                <message v-for="message in messages" :message="message" :key="`message-${message.id}`" :current-user="currentUser"/>
             </div>
-            <message-form />
+            <message-form ref="messageForm"/>
         </div>
     </div>
 </template>
@@ -27,7 +34,6 @@
 <script>
 import AddChannel from '@/components/AddChannel'
 import Channel from '@/components/Channel'
-import Message from '@/components/Message'
 import MessageForm from '@/components/MessageForm'
 import MessageLoader from '@/components/MessageLoader'
 
@@ -36,44 +42,60 @@ export default {
     components: {
         AddChannel,
         Channel,
-        Message,
         MessageForm,
         MessageLoader
     },
     data () {
         return {
-            messages: []
+            channelsListRef: window.firebase.firestore().collection('channels'),
+            channelListener: () => {},
+            channels: []
         }
     },
     computed: {
         currentUser () {
             return this.$store.getters.currentUser
+        },
+        currentChannel () {
+            return this.$store.getters.currentChannel
         }
     },
     methods: {
         logout () {
             window.firebase.auth().signOut()
                 .then(() => {
+                    this.channelListener()
                     this.$store.dispatch('setCurrentUser', null)
                     this.$router.push('/signIn')
                 })
                 .catch(error => {
                     console.error(error.message)
                 })
+        },
+        setActiveChannel (channelName) {
+            this.$store.dispatch('setCurrentChannel', channelName)
+            this.$nextTick(() => {
+                this.$refs.messageForm.$el.querySelector('textarea').focus()
+            })
+        },
+        archiveChannel (channelName) {
+            if (this.currentChannel === channelName) {
+                this.setActiveChannel('todos')
+            }
+
+            window.firebase.firestore()
+                .collection('channels')
+                .doc(channelName)
+                .set({ archived: true }, { merge: true })
         }
     },
     created () {
-        for (let i = 1; i <= 5; i++) {
-            this.messages.push({
-                id: i,
-                content: `Mensage ${i}`,
-                timestamp: Date.now(),
-                user: {
-                    id: 1,
-                    name: 'Rafaéla Machado'
-                }
+        this.channelListener = this.channelsListRef
+            .where('archived', '==', false)
+            .orderBy('createdAt', 'desc')
+            .onSnapshot((querySnapshot) => {
+                this.channels = querySnapshot.docs.map(doc => doc.id)
             })
-        }
     }
 }
 </script>

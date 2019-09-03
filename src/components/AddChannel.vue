@@ -11,6 +11,10 @@
                     type="text"
                     class="new-channel ml-1"
                     ref="addChannelInput"
+                    v-model.trim="name"
+                    @keyup.enter="add"
+                    @keyup.esc="toggleAddChannel"
+                    @keydown.space.prevent
                 />
             </div>
         </transition>
@@ -33,6 +37,20 @@ export default {
             this.$nextTick(() => {
                 this.$refs.addChannelInput.focus()
             })
+        },
+        add () {
+            if (!this.name || this.name === 'todos') return
+            window.firebase.firestore().collection('channels').doc(this.name)
+                .set({
+                    name: this.name,
+                    archived: false,
+                    createdAt: window.firebase.firestore.FieldValue.serverTimestamp()
+                })
+                .then(() => {
+                    this.name = ''
+                    this.isAdding = false
+                })
+                .catch(error => console.error(error))
         }
     }
 }

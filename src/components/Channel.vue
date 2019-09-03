@@ -1,10 +1,12 @@
 <template functional>
-    <div class="d-flex channel rounded p-1 mb-1">
-        <div class="w-100">#{{props.name}}</div>
+    <div class="d-flex channel rounded p-1 mb-1" :class="{'is-active': props.isActive}">>
+        <div class="w-100" @click="listeners.activate(props.name)">#{{props.name}}</div>
         <button
             title="Archive"
             type="button"
             class="ml-auto d-flex align-items-center btn btn-link btn-sm p-0"
+            v-if="props.name !== 'todos'"
+            @click="listeners.archive(props.name)"
         >
             <i class="material-icons">archive</i>
         </button>
