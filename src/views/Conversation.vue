@@ -2,6 +2,9 @@
     <div class="container-fluid h-100 p-0 d-flex">
         <div class="w-25 sidebar">
             <div class="current-user bg-light d-flex align-items-center flex-nowrap p-2">
+                <user-avatar :name="currentUser.username"/>
+                <div class="ml-2 text-truncate">{{currentUser.username}}</div>
+                <button class="btn btn-sm btn-link ml-auto"><i class="material-icons">exit_to_app</i></button>
             </div>
             <div class="channels-list bg-light p-2">
             </div>
@@ -20,7 +23,29 @@
 
 <script>
 export default {
-    name: 'Conversation'
+    name: 'Conversation',
+    data () {
+        return {
+            currentUser: {
+                id: 1,
+                username: 'Rafaéla Machado'
+            },
+            messages: []
+        }
+    },
+    created () {
+        for (let i = 1; i <= 10; i++) {
+            this.messages.push({
+                id: i,
+                content: `Mensage ${i}`,
+                timestamp: Date.now(),
+                user: {
+                    id: 1,
+                    name: 'Rafaéla Machado'
+                }
+            })
+        }
+    }
 }
 </script>
 
