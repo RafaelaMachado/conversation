@@ -7,6 +7,9 @@ const SignUp = () => import('@/views/SignUp' /* webpackChunkName: "signUp" */)
 
 Vue.use(Router)
 
+const redirectToConversation = (to, from, next) => window.firebase.auth().currentUser ? next('/') : next()
+const redirectToSignIn = (to, from, next) => !window.firebase.auth().currentUser ? next('/signIn') : next()
+
 export default new Router({
     mode: 'history',
     base: process.env.BASE_URL,
@@ -14,17 +17,20 @@ export default new Router({
         {
             name: 'conversation',
             path: '/',
-            component: Conversation
+            component: Conversation,
+            beforeEnter: redirectToSignIn
         },
         {
             name: 'signIn',
             path: '/signIn',
-            component: SignIn
+            component: SignIn,
+            beforeEnter: redirectToConversation
         },
         {
             name: 'signUp',
             path: '/signUp',
-            component: SignUp
+            component: SignUp,
+            beforeEnter: redirectToConversation
         },
         {
             path: '*',

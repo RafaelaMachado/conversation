@@ -1,7 +1,7 @@
 <template functional>
     <div :class="['message mb-2', {'of-me': props.currentUser && props.message.user.id === props.currentUser.id}]" :key="data.key || _uid">
         <div class="message-avatar">
-            <avatar :name="props.message.user.name" :size="24"/>
+            <user-avatar :name="props.message.user.name" :size="24"/>
         </div>
         <div class="message-text border rounded d-flex flex-column mx-1 px-2 py-1">
             <small class="font-italic">
