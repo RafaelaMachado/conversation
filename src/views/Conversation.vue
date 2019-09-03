@@ -63,10 +63,10 @@ export default {
     data () {
         return {
             channelsListRef: window.firebase.firestore().collection('channels'),
-            channelListener: () => {},
-            channels: [],
             loadingMessages: false,
+            channels: [],
             messages: [],
+            channelListener: () => {},
             messageListener: () => {}
         }
     },
@@ -82,6 +82,7 @@ export default {
         logout () {
             window.firebase.auth().signOut()
                 .then(() => {
+                    this.messageListener()
                     this.channelListener()
                     this.$store.dispatch('setCurrentUser', null)
                     this.$router.push('/signIn')
@@ -138,6 +139,7 @@ export default {
             .onSnapshot((querySnapshot) => {
                 this.channels = querySnapshot.docs.map(doc => doc.id)
             })
+        this.setActiveChannel('todos')
     },
     watch: {
         currentChannel: {

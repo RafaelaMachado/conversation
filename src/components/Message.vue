@@ -6,7 +6,7 @@
         <div class="message-text border rounded d-flex flex-column mx-1 px-2 py-1">
             <small class="font-italic">
                 <span class="font-weight-bold">{{ props.message.user.name }}</span>
-                {{ props.message.timestamp }}:
+                {{ props.message.timestamp | timeAgo }}:
             </small>
             <pre class="m-0">{{ props.message.content }}</pre>
         </div>
