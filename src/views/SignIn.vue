@@ -3,7 +3,7 @@
         <div class="row w-100">
             <div class="col col-sm-12 col-md-4 offset-md-4">
                 <div class="col text-center text-30 pb-2">
-                    Sign in to Conversations
+                    Sign In to Conversations
                 </div>
                 <div class="card">
                     <div class="card-body">
