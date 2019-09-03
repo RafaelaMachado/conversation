@@ -16,6 +16,7 @@
             <div class="channel-header bg-light p-2 d-flex align-items-center">
             </div>
             <div class="channel-messages flex-grow-1 p-2" ref="channelMessages">
+                <message-loader />
             </div>
             <div style="height: 50px;" class="message-form border-top d-flex align-items-center">
             </div>
@@ -26,12 +27,14 @@
 <script>
 import AddChannel from '@/components/AddChannel'
 import Channel from '@/components/Channel'
+import MessageLoader from '@/components/MessageLoader'
 
 export default {
     name: 'Conversation',
     components: {
         AddChannel,
-        Channel
+        Channel,
+        MessageLoader
     },
     data () {
         return {
