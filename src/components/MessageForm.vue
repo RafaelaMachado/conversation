@@ -41,6 +41,7 @@ export default {
                 })
                 .then(() => {
                     this.message = ''
+                    this.detectIfUserIsTyping()
                     this.$nextTick(() => {
                         this.$refs.textarea.focus()
                     })
