@@ -16,9 +16,19 @@
                     @activate="setActiveChannel"
                     @archive="archiveChannel"
                 />
+                <hr>
+                <div class="text-center">
+                    Users
+                </div>
+                <span v-for="(user, index) in users" :key="`user-${index}`">
+                    <span v-if="user.name" class="d-flex user rounded p-1 mb-1 user text-truncate">
+                        <i class="material-icons mr-2" :class="{'btn-success': user.isOnline, 'btn-secondary': !user.isOnline}">person</i>
+                        {{ user.name }}
+                        <i v-if="user.isTyping" class="material-icons ml-2 flash">comment</i>
+                    </span>
+                </span>
             </div>
         </div>
-
         <div class="d-flex flex-column w-75">
             <div class="channel-header bg-light p-2 d-flex align-items-center">
                 #{{ currentChannel }}
@@ -67,7 +77,10 @@ export default {
             channels: [],
             messages: [],
             channelListener: () => {},
-            messageListener: () => {}
+            messageListener: () => {},
+            usersRef: window.firebase.firestore().collection('users'),
+            users: [],
+            usersOnline: []
         }
     },
     computed: {
@@ -80,6 +93,7 @@ export default {
     },
     methods: {
         logout () {
+            this.usersRef.doc(this.currentUser.uid).set({ isOnline: false }, { merge: true })
             window.firebase.auth().signOut()
                 .then(() => {
                     this.messageListener()
@@ -133,6 +147,7 @@ export default {
         }
     },
     created () {
+        let vm = this
         this.channelListener = this.channelsListRef
             .where('archived', '==', false)
             .orderBy('createdAt', 'desc')
@@ -140,6 +155,50 @@ export default {
                 this.channels = querySnapshot.docs.map(doc => doc.id)
             })
         this.setActiveChannel('todos')
+
+        this.usersRef.onSnapshot(function (querySnapshot) {
+            vm.users = []
+            querySnapshot.forEach(function (doc) {
+                vm.users.push(doc.data())
+            })
+        })
+
+        var uid = window.firebase.auth().currentUser.uid
+
+        var userStatusDatabaseRef = window.firebase.database().ref('/status/' + uid)
+        var isOfflineForDatabase = {
+            isOnline: false,
+            lastChanged: window.firebase.database.ServerValue.TIMESTAMP
+        }
+
+        var isOnlineForDatabase = {
+            isOnline: true,
+            lastChanged: window.firebase.database.ServerValue.TIMESTAMP
+        }
+
+        var isOfflineForFirestore = {
+            isOnline: false,
+            lastChanged: window.firebase.firestore.FieldValue.serverTimestamp()
+        }
+
+        var isOnlineForFirestore = {
+            isOnline: true,
+            lastChanged: window.firebase.firestore.FieldValue.serverTimestamp()
+        }
+
+        var userStatusFirestoreRef = this.usersRef.doc(this.currentUser.uid)
+
+        window.firebase.database().ref('.info/connected').on('value', function (snapshot) {
+            if (snapshot.val() === false) {
+                userStatusFirestoreRef.set(isOfflineForFirestore, { merge: true })
+                return
+            }
+
+            userStatusDatabaseRef.onDisconnect().set(isOfflineForDatabase).then(function () {
+                userStatusFirestoreRef.set(isOnlineForFirestore, { merge: true })
+                userStatusDatabaseRef.set(isOnlineForDatabase)
+            })
+        })
     },
     watch: {
         currentChannel: {

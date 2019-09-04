@@ -1,6 +1,6 @@
 <template>
     <div class="message-form d-flex align-items-center bg-light">
-        <textarea placeholder="Enter your message here" class="bg-light" v-model.trim="message" @keydown.enter.prevent="sendMessage" ref="textarea"/>
+        <textarea placeholder="Enter your message here" class="bg-light" v-model.trim="message" @keydown.enter.prevent="sendMessage" @keyup="detectIfUserIsTyping" ref="textarea"/>
         <button @click="sendMessage" class="btn btn-sm btn-purple border-left">
             <i class="material-icons">message</i>
         </button>
@@ -12,7 +12,8 @@ export default {
     name: 'MessageForm',
     data () {
         return {
-            message: ''
+            message: '',
+            usersRef: window.firebase.firestore().collection('users')
         }
     },
     computed: {
@@ -44,6 +45,17 @@ export default {
                         this.$refs.textarea.focus()
                     })
                 })
+        },
+        detectIfUserIsTyping () {
+            if (this.message !== '') {
+                if (!this.isTyping) {
+                    this.usersRef.doc(this.currentUser.uid).set({ isTyping: true }, { merge: true })
+                }
+                this.isTyping = true
+                return
+            }
+            this.isTyping = false
+            this.usersRef.doc(this.currentUser.uid).set({ isTyping: false }, { merge: true })
         }
     }
 }

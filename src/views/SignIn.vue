@@ -39,7 +39,8 @@ export default {
             email: '',
             password: '',
             errors: [],
-            isLoading: false
+            isLoading: false,
+            usersRef: window.firebase.firestore().collection('users')
         }
     },
     methods: {
@@ -51,12 +52,16 @@ export default {
                 .signInWithEmailAndPassword(this.email, this.password)
                 .then(user => {
                     this.$store.dispatch('setCurrentUser', user)
+                    this.saveUserIntoFirestore(user)
                     this.$router.push('/')
                 })
                 .catch(error => {
                     this.errors.push(error.message)
                     this.isLoading = false
                 })
+        },
+        saveUserIntoFirestore (user) {
+            return this.usersRef.doc(user.user.uid).set({ isOnline: true }, { merge: true })
         },
         isFormValid () {
             if (!this.email.length || !this.password.length) {
