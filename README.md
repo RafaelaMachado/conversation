@@ -1,6 +1,6 @@
 # conversation
 
-Este projeto foi criado a fins de estudos iniciais para a criação do novo modulo "Conversations" do Operand e tabem utilizado como base para criação do workshop de Vue e Firebase repassado para todo o time de dev interno.
+Este projeto foi criado a fins de estudos iniciais para a criação do novo modulo "Conversations" do Operand e tambem utilizado como base para criação do workshop de Vue e Firebase repassado para todo o time de dev interno.
 
 https://chat-304a0.firebaseapp.com/signIn
 
