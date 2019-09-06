@@ -13,6 +13,7 @@
         "firebase": "^6.5.0",
         "moment": "^2.24.0",
         "vue": "^2.6.10",
+        "vue-emoji-picker": "^1.0.1",
         "vue-router": "^3.0.3",
         "vuex": "^3.0.1"
     },
